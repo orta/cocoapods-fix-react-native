@@ -1,4 +1,4 @@
 .DS_Store
 pkg
 .idea/
-Gemfile.lock # on purpose
+Gemfile.lock
