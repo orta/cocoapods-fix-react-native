@@ -15,7 +15,8 @@ Swift, you're pretty far from their workflow.
 In order to get it working for just you app you scour, like, a million issues on React Native (or go look at
 [artsy/eigen][eigen]) to get it compiling on your setup. Again, not optimal.
 
-This plugin _tries_ to fix this by centralizing the code needed to modify React Native make it work.
+This plugin _tries_ to fix this by centralizing the code needed to modify React Native. This means makes it easy to update
+your versions of React Native, because you can update the gem at the same time.
 
 ## Installation
 
@@ -34,6 +35,10 @@ Then remove any React Native related `post_install` code, and add this to the to
 
 For the first time you do this, I'd recommend running `rm -rf Pods; bundle exec pod install`. After that you can
 `bundle exec pod install` like normal.
+
+## How do I Update This?
+
+`bundle update cocoapods-fix-react-native`.
 
 ## How Does This Work?
 
