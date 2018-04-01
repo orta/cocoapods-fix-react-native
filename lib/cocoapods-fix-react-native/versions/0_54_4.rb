@@ -45,10 +45,11 @@ def fix_cplusplus_header_compiler_error
 end
 
 def fix_unused_yoga_headers
-  filepath = './Pods/Target Support Files/yoga/yoga-umbrella.h'
+  filepath = 'Pods/Target Support Files/yoga/yoga-umbrella.h'
+  # This only exists when using CocoaPods + Frameworks
+  return unless File.exists?(filepath)
 
   contents = []
-
   file = File.open(filepath, 'r')
   file.each_line do |line|
     contents << line
