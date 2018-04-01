@@ -1,4 +1,4 @@
-Hi there! This a CocoaPods plugin that _we, the community_, can use to plug the holes in React Native's CocoaPods
+Hi there! This a CocoaPods plugin that **we, the community**, can use to plug the holes in React Native's CocoaPods
 support.
 
 CocoaPods allows you to add code to run at the end of the Podfile via a `post_install` hook. You probably already have
@@ -15,8 +15,8 @@ Swift, you're pretty far from their workflow.
 In order to get it working for just you app you scour, like, a million issues on React Native (or go look at
 [artsy/eigen][eigen]) to get it compiling on your setup. Again, not optimal.
 
-This plugin _tries_ to fix this by centralizing the code needed to modify React Native. This means makes it easy to update
-your versions of React Native, because you can update the gem at the same time.
+This plugin _tries_ to fix this by centralizing the code needed to modify React Native. This means makes it easy to
+update your versions of React Native, because you can update the gem at the same time.
 
 ## Installation
 
@@ -70,9 +70,11 @@ underscores. E.g. `0.54.4` -> `0_54_4.rb`.
 The scripts itself should be entirely self contained, so that it's easy to understand wthout learning the project.
 
 The biggest change you'd need to make from the sort of code you can find inside the issues is that it needs to support
-many different potential roots. So instead of just `Pods/` - it wants to also handle `node_modules/react-native` and
-`../node_modules/react-native`. This can be done by removing `'Pods'` from the path and wrapping it with a
-`File.join(root, 'Path/InReactLib.js')`.
+many different potential roots. So instead of just `Pods/React/*` - this plugin will also handle
+`node_modules/react-native/*` and `../node_modules/react-native/*`. Basically, your dev repo, and your prod app.
+
+This can be done by removing `'Pods/React'` from the path and wrapping it with a
+`File.join(root, 'Path/InReactLib.js')`. You'll see this in the current scripts.
 
 ### Getting Setup To Improve
 
@@ -98,4 +100,4 @@ As `use_frameworks!` is more strict than static libraries, I'd recommend working
 frameworks.
 
 [eigen]: https://github.com/artsy/eigen/
-[versions]: lib/cocoapods-fix-react-native/versions/
+[versions]: https://github.com/orta/cocoapods-fix-react-native/tree/master/lib/cocoapods-fix-react-native/versions

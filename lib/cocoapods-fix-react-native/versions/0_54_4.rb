@@ -1,3 +1,8 @@
+# Notes:
+#
+#  - All file paths should be relative to the React repo, rather than the Pods dir, or node_modules
+#
+
 # Are you using :path based Pods?
 dev_pods_react = !File.directory?('Pods/React/React')
 
@@ -6,15 +11,15 @@ same_repo_node_modules = File.directory?('node_modules/react-native')
 previous_repo_node_modules = File.directory?('../node_modules/react-native')
 
 # Find out where the files could be rooted
-root = 'Pods'
+$root = 'Pods/React'
 if dev_pods_react
-  root = 'node_modules/react-native' if same_repo_node_modules
-  root = '../node_modules/react-native' if previous_repo_node_modules
+  $root = 'node_modules/react-native' if same_repo_node_modules
+  $root = '../node_modules/react-native' if previous_repo_node_modules
 end
 
 # TODO: move to be both file in pods and file in node_mods?
 def edit_pod_file(path, old_code, new_code)
-  file = File.join(root, path)
+  file = File.join($root, path)
   code = File.read(file)
   if code.include?(old_code)
     FileUtils.chmod('+w', file)
@@ -23,7 +28,7 @@ def edit_pod_file(path, old_code, new_code)
 end
 
 def fix_cplusplus_header_compiler_error
-  filepath = File.join(root, 'Pods/React/React/Base/Surface/SurfaceHostingView/RCTSurfaceSizeMeasureMode.h')
+  filepath = File.join($root, 'React/Base/Surface/SurfaceHostingView/RCTSurfaceSizeMeasureMode.h')
   FileUtils.chmod('+w', filepath)
 
   contents = []
@@ -72,15 +77,15 @@ fix_unused_yoga_headers
 fix_cplusplus_header_compiler_error
 
 # https://github.com/facebook/react-native/pull/14664
-animation_view_file = 'React/Libraries/NativeAnimation/RCTNativeAnimatedNodesManager.h'
+animation_view_file = 'Libraries/NativeAnimation/RCTNativeAnimatedNodesManager.h'
 animation_view_old_code = 'import <RCTAnimation/RCTValueAnimatedNode.h>'
 animation_view_new_code = 'import "RCTValueAnimatedNode.h"'
 edit_pod_file animation_view_file, animation_view_old_code, animation_view_new_code
 
 # https://github.com/facebook/react-native/issues/13198
 # Only needed when you have the DevSupport subspec
-if File.exist?(File.join(root, 'React/Libraries/WebSocket/RCTReconnectingWebSocket.m'))
-  websocket = 'React/Libraries/WebSocket/RCTReconnectingWebSocket.m'
+if File.exist?(File.join($root, 'Libraries/WebSocket/RCTReconnectingWebSocket.m'))
+  websocket = 'Libraries/WebSocket/RCTReconnectingWebSocket.m'
   websocket_old_code = 'import <fishhook/fishhook.h>'
   websocket_new_code = 'import <React/fishhook.h>'
   edit_pod_file websocket, websocket_old_code, websocket_new_code
@@ -88,8 +93,8 @@ end
 
 # Newer build of Xcode don't allow you to set a non-obj to be strong,
 # so this instead changes it to be an assign.
-module_data_file = 'React/React/Base/RCTModuleData.h'
-bridge_module_file = 'React/React/Base/RCTBridgeModule.h'
+module_data_file = 'React/Base/RCTModuleData.h'
+bridge_module_file = 'React/Base/RCTBridgeModule.h'
 method_queue_old_code = '(nonatomic, strong, readonly) dispatch_queue_t methodQueue'
 method_queue_new_code = '(nonatomic, assign, readonly) dispatch_queue_t methodQueue'
 edit_pod_file module_data_file, method_queue_old_code, method_queue_new_code
