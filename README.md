@@ -40,6 +40,8 @@ For the first time you do this, I'd recommend running `rm -rf Pods; bundle exec 
 
 `bundle update cocoapods-fix-react-native`.
 
+This project is auto-deployed after every merged PR, so it's should always be up-to-date.
+
 ## How Does This Work?
 
 A CocoaPods plugin can register a `post_install` hook just like you can in your `Podfile`. This hook will first look at
