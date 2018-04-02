@@ -84,11 +84,20 @@ edit_pod_file animation_view_file, animation_view_old_code, animation_view_new_c
 
 # https://github.com/facebook/react-native/issues/13198
 # Only needed when you have the DevSupport subspec
-if File.exist?(File.join($root, 'Libraries/WebSocket/RCTReconnectingWebSocket.m'))
+has_dev_support = File.exist?(File.join($root, 'Libraries/WebSocket/RCTReconnectingWebSocket.m'))
+
+if has_dev_support
+  # Move Fishhook to be based on RN's imports
   websocket = 'Libraries/WebSocket/RCTReconnectingWebSocket.m'
   websocket_old_code = 'import <fishhook/fishhook.h>'
   websocket_new_code = 'import <React/fishhook.h>'
   edit_pod_file websocket, websocket_old_code, websocket_new_code
+else
+  # There's a link in the DevSettings to dev-only import
+  dev_settings = 'React/Modules/RCTDevSettings.mm'
+  dev_settings_old_code = '#import "RCTPackagerClient.h"'
+  dev_settings_new_code = '//#import //"RCTPackagerClient.h"'
+  edit_pod_file dev_settings, dev_settings_old_code, dev_settings_new_code
 end
 
 # Newer build of Xcode don't allow you to set a non-obj to be strong,
