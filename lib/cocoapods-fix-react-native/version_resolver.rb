@@ -3,8 +3,8 @@ class CocoaPodsFixReactNative
     # Get the current version of React Native in your app
     react = nil
     context.umbrella_targets.each do |target|
-      react = target.specs.find { |s| s.name == 'React' || s.name.start_with?('React/') }
-      react = react if react
+      react_spec = target.specs.find { |s| s.name == 'React' || s.name.start_with?('React/') }
+      react = react_spec if react_spec
     end
 
     # 0.44.1 -> 0_44_1
