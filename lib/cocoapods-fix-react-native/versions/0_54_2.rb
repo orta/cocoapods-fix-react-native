@@ -118,12 +118,3 @@ else
     f.puts(contents)
   end
 end
-
-# Newer build of Xcode don't allow you to set a non-obj to be strong,
-# so this instead changes it to be an assign.
-module_data_file = 'React/Base/RCTModuleData.h'
-bridge_module_file = 'React/Base/RCTBridgeModule.h'
-method_queue_old_code = '(nonatomic, strong, readonly) dispatch_queue_t methodQueue'
-method_queue_new_code = '(nonatomic, assign, readonly) dispatch_queue_t methodQueue'
-edit_pod_file module_data_file, method_queue_old_code, method_queue_new_code
-edit_pod_file bridge_module_file, method_queue_old_code, method_queue_new_code
