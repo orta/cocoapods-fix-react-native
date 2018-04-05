@@ -112,9 +112,9 @@ else
 
     contents.insert(207, comment_start)
     contents.insert(231, comment_end)
-  end
 
-  file = File.open(filepath, 'w') do |f|
-    f.puts(contents)
+    file = File.open(filepath, 'w') do |f|
+      f.puts(contents)
+    end
   end
 end
