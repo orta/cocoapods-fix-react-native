@@ -6,6 +6,9 @@
 # Are you using :path based Pods?
 dev_pods_react = !File.directory?('Pods/React/React')
 
+# Detect CocoaPods + Frameworks
+has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
+
 # Check for whether
 same_repo_node_modules = File.directory?('node_modules/react-native')
 previous_repo_node_modules = File.directory?('../node_modules/react-native')
@@ -73,11 +76,6 @@ def fix_unused_yoga_headers
   end
 end
 
-# Detect CocoaPods + Frameworks
-def has_frameworks
-  filepath = 'Pods/Target Support Files/React/React-umbrella.h'
-  return File.exists?(filepath)
-end
 
 def fix_method_queue_property_defs
   return if has_frameworks
@@ -87,7 +85,7 @@ def fix_method_queue_property_defs
   module_data_file = 'React/Base/RCTModuleData.h'
   bridge_module_file = 'React/Base/RCTBridgeModule.h'
   method_queue_old_code = '(nonatomic, strong, readonly) dispatch_queue_t methodQueue'
-  method_queue_new_code = '(nonatomic, assign, readonly) dispatch_queue_t methodQueue'
+  method_queue_new_code = '(nonatomic, retain, readonly) dispatch_queue_t methodQueue'
   edit_pod_file module_data_file, method_queue_old_code, method_queue_new_code
   edit_pod_file bridge_module_file, method_queue_old_code, method_queue_new_code
 end
