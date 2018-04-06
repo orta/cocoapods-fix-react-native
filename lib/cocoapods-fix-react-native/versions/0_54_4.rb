@@ -73,8 +73,28 @@ def fix_unused_yoga_headers
   end
 end
 
+# Detect CocoaPods + Frameworks
+def has_frameworks
+  filepath = 'Pods/Target Support Files/React/React-umbrella.h'
+  return File.exists?(filepath)
+end
+
+def fix_method_queue_property_defs
+  return if has_frameworks
+
+  # Newer build of Xcode don't allow you to set a non-obj to be strong,
+  # so this instead changes it to be an assign.
+  module_data_file = 'React/Base/RCTModuleData.h'
+  bridge_module_file = 'React/Base/RCTBridgeModule.h'
+  method_queue_old_code = '(nonatomic, strong, readonly) dispatch_queue_t methodQueue'
+  method_queue_new_code = '(nonatomic, assign, readonly) dispatch_queue_t methodQueue'
+  edit_pod_file module_data_file, method_queue_old_code, method_queue_new_code
+  edit_pod_file bridge_module_file, method_queue_old_code, method_queue_new_code
+end
+
 fix_unused_yoga_headers
 fix_cplusplus_header_compiler_error
+fix_method_queue_property_defs
 
 # https://github.com/facebook/react-native/pull/14664
 animation_view_file = 'Libraries/NativeAnimation/RCTNativeAnimatedNodesManager.h'
@@ -99,12 +119,3 @@ else
   dev_settings_new_code = '//#import //"RCTPackagerClient.h"'
   edit_pod_file dev_settings, dev_settings_old_code, dev_settings_new_code
 end
-
-# Newer build of Xcode don't allow you to set a non-obj to be strong,
-# so this instead changes it to be an assign.
-module_data_file = 'React/Base/RCTModuleData.h'
-bridge_module_file = 'React/Base/RCTBridgeModule.h'
-method_queue_old_code = '(nonatomic, strong, readonly) dispatch_queue_t methodQueue'
-method_queue_new_code = '(nonatomic, assign, readonly) dispatch_queue_t methodQueue'
-edit_pod_file module_data_file, method_queue_old_code, method_queue_new_code
-edit_pod_file bridge_module_file, method_queue_old_code, method_queue_new_code
