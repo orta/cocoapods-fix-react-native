@@ -7,7 +7,7 @@
 dev_pods_react = !File.directory?('Pods/React/React')
 
 # Detect CocoaPods + Frameworks
-$has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
+# $has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
 
 # Check for whether
 same_repo_node_modules = File.directory?('node_modules/react-native')
@@ -76,23 +76,8 @@ def fix_unused_yoga_headers
   end
 end
 
-
-def fix_method_queue_property_defs
-  return if $has_frameworks
-
-  # Newer build of Xcode don't allow you to set a non-obj to be strong,
-  # so this instead changes it to be an assign.
-  module_data_file = 'React/Base/RCTModuleData.h'
-  bridge_module_file = 'React/Base/RCTBridgeModule.h'
-  method_queue_old_code = '(nonatomic, strong, readonly) dispatch_queue_t methodQueue'
-  method_queue_new_code = '(nonatomic, retain, readonly) dispatch_queue_t methodQueue'
-  edit_pod_file module_data_file, method_queue_old_code, method_queue_new_code
-  edit_pod_file bridge_module_file, method_queue_old_code, method_queue_new_code
-end
-
 fix_unused_yoga_headers
 fix_cplusplus_header_compiler_error
-fix_method_queue_property_defs
 
 # https://github.com/facebook/react-native/pull/14664
 animation_view_file = 'Libraries/NativeAnimation/RCTNativeAnimatedNodesManager.h'
