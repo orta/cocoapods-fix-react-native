@@ -7,7 +7,7 @@
 dev_pods_react = !File.directory?('Pods/React/React')
 
 # Detect CocoaPods + Frameworks
-has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
+$has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
 
 # Check for whether
 same_repo_node_modules = File.directory?('node_modules/react-native')
@@ -78,7 +78,7 @@ end
 
 
 def fix_method_queue_property_defs
-  return if has_frameworks
+  return if $has_frameworks
 
   # Newer build of Xcode don't allow you to set a non-obj to be strong,
   # so this instead changes it to be an assign.
