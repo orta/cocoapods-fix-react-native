@@ -7,7 +7,7 @@
 dev_pods_react = !File.directory?('Pods/React/React')
 
 # Detect CocoaPods + Frameworks
-# $has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
+$has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
 
 # Check for whether
 same_repo_node_modules = File.directory?('node_modules/react-native')
@@ -76,8 +76,41 @@ def fix_unused_yoga_headers
   end
 end
 
+# Detect source file dependency in the generated Pods.xcodeproj workspace sub-project
+def has_pods_project_source_file(source_filename)
+  pods_project = 'Pods/Pods.xcodeproj/project.pbxproj'
+  if File.foreach(pods_project).grep(/#{source_filename}/).any?
+    return true
+  end
+  return false
+end
+
+def detect_missing_subspecs
+  return unless $has_frameworks
+
+  # If For CocoaPods + Frameworks, RCTNetwork and CxxBridge subspecs are necessary for DevSupport.
+  # When the React pod is generated it must include all the required source, and see umbrella deps.
+
+  if has_pods_project_source_file 'RCTBlobManager.mm'
+    # then it may fail to compile then fail to link if it does not also have:
+    dependency = 'RCTNetworking.mm'
+    unless has_pods_project_source_file dependency
+      puts '[!] RCTNetwork subspec may be required given your current dependencies'
+    end
+  end
+
+  if has_pods_project_source_file 'RCTJavaScriptLoader.mm'
+    # then it may fail to compile then fail to link if it does not also have:
+    dependency = 'RCTCxxBridge.mm'
+    unless has_pods_project_source_file dependency
+      puts '[!] CxxBridge subspec may be required given your current dependencies'
+    end
+  end
+end
+
 fix_unused_yoga_headers
 fix_cplusplus_header_compiler_error
+detect_missing_subspecs
 
 # https://github.com/facebook/react-native/pull/14664
 animation_view_file = 'Libraries/NativeAnimation/RCTNativeAnimatedNodesManager.h'
