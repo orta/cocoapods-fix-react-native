@@ -7,7 +7,7 @@
 dev_pods_react = !File.directory?('Pods/React/React')
 
 # Detect CocoaPods + Frameworks
-# $has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
+$has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
 
 # Check for whether
 same_repo_node_modules = File.directory?('node_modules/react-native')
@@ -76,8 +76,38 @@ def fix_unused_yoga_headers
   end
 end
 
+# Detect source file dependency in the generated Pods.xcodeproj workspace sub-project
+def has_pods_project_source_file(source_filename)
+  pods_project = 'Pods/Pods.xcodeproj/project.pbxproj'
+  File.open(pods_project).grep(/#{source_filename}/).any?
+end
+
+# Detect dependent source file required for building when the given source file is present
+def meets_pods_project_source_dependency(source_filename, dependent_source_filename)
+  has_pods_project_source_file(source_filename) ? has_pods_project_source_file(dependent_source_filename) : true
+end
+
+def detect_missing_subspec_dependency(subspec_name, source_filename, dependent_source_filename)
+  unless meets_pods_project_source_dependency(source_filename, dependent_source_filename)
+    puts "[!] #{subspec_name} subspec may be required given your current dependencies"
+  end
+end
+
+def detect_missing_subspecs
+  return unless $has_frameworks
+
+  # For CocoaPods + Frameworks, RCTNetwork and CxxBridge subspecs are necessary for DevSupport.
+  # When the React pod is generated it must include all the required source, and see umbrella deps.
+  detect_missing_subspec_dependency('RCTNetwork', 'RCTBlobManager.mm', 'RCTNetworking.mm')
+  detect_missing_subspec_dependency('CxxBridge', 'RCTJavaScriptLoader.mm', 'RCTCxxBridge.mm')
+
+  # RCTText itself shouldn't require DevSupport, but it depends on Core -> RCTDevSettings -> RCTPackagerClient
+  detect_missing_subspec_dependency('DevSupport', 'RCTDevSettings.mm', 'RCTPackagerClient.m')
+end
+
 fix_unused_yoga_headers
 fix_cplusplus_header_compiler_error
+detect_missing_subspecs
 
 # https://github.com/facebook/react-native/pull/14664
 animation_view_file = 'Libraries/NativeAnimation/RCTNativeAnimatedNodesManager.h'
