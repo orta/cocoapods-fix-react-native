@@ -79,10 +79,7 @@ end
 # Detect source file dependency in the generated Pods.xcodeproj workspace sub-project
 def has_pods_project_source_file(source_filename)
   pods_project = 'Pods/Pods.xcodeproj/project.pbxproj'
-  if File.foreach(pods_project).grep(/#{source_filename}/).any?
-    return true
-  end
-  return false
+  File.open(pods_project).grep(/#{source_filename}/).any?
 end
 
 def detect_missing_subspecs
