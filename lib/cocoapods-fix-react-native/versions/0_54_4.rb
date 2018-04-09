@@ -82,27 +82,24 @@ def has_pods_project_source_file(source_filename)
   File.open(pods_project).grep(/#{source_filename}/).any?
 end
 
+# Detect dependent source file required for building when the given source file is present
+def has_pods_project_source_dependency(source_filename, dependent_source_filename)
+  return has_pods_project_source_file(source_filename) && has_pods_project_source_file(dependent_source_filename)
+end
+
+def detect_missing_subspec_dependency(subspec_name, source_filename, dependent_source_filename)
+  unless has_pods_project_source_dependency(source_filename, dependent_source_filename)
+    puts "[!] #{subspec_name} subspec may be required given your current dependencies"
+  end
+end
+
 def detect_missing_subspecs
   return unless $has_frameworks
 
-  # If For CocoaPods + Frameworks, RCTNetwork and CxxBridge subspecs are necessary for DevSupport.
+  # For CocoaPods + Frameworks, RCTNetwork and CxxBridge subspecs are necessary for DevSupport.
   # When the React pod is generated it must include all the required source, and see umbrella deps.
-
-  if has_pods_project_source_file 'RCTBlobManager.mm'
-    # then it may fail to compile then fail to link if it does not also have:
-    dependency = 'RCTNetworking.mm'
-    unless has_pods_project_source_file dependency
-      puts '[!] RCTNetwork subspec may be required given your current dependencies'
-    end
-  end
-
-  if has_pods_project_source_file 'RCTJavaScriptLoader.mm'
-    # then it may fail to compile then fail to link if it does not also have:
-    dependency = 'RCTCxxBridge.mm'
-    unless has_pods_project_source_file dependency
-      puts '[!] CxxBridge subspec may be required given your current dependencies'
-    end
-  end
+  detect_missing_subspec_dependency('RCTNetwork', 'RCTBlobManager.mm', 'RCTNetworking.mm')
+  detect_missing_subspec_dependency('CxxBridge', 'RCTJavaScriptLoader.mm', 'RCTCxxBridge.mm')
 end
 
 fix_unused_yoga_headers
