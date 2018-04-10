@@ -127,8 +127,27 @@ if has_dev_support
   edit_pod_file websocket, websocket_old_code, websocket_new_code
 else
   # There's a link in the DevSettings to dev-only import
-  dev_settings = 'React/Modules/RCTDevSettings.mm'
-  dev_settings_old_code = '#import "RCTPackagerClient.h"'
-  dev_settings_new_code = '//#import //"RCTPackagerClient.h"'
-  edit_pod_file dev_settings, dev_settings_old_code, dev_settings_new_code
+  filepath = "#{$root}/React/Modules/RCTDevSettings.mm"
+  contents = []
+  file = File.open(filepath, 'r')
+  found = false
+  file.each_line do |line|
+    contents << line
+  end
+  file.close
+
+  comment_start = '#if ENABLE_PACKAGER_CONNECTION'
+  comment_end = '#endif'
+
+  if contents[22].rstrip != comment_start
+    contents.insert(22, comment_start)
+    contents.insert(24, comment_end)
+
+    contents.insert(207, comment_start)
+    contents.insert(231, comment_end)
+
+    file = File.open(filepath, 'w') do |f|
+      f.puts(contents)
+    end
+  end
 end
