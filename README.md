@@ -12,7 +12,7 @@ use - the onus is on you to make sure it continues to work. Facebook have a big 
 CocoaPods, and they also use static compilation because they don't use Swift. Meaning if you want to use CocoaPods and
 Swift, you're pretty far from their workflow.
 
-In order to get it working for just you app you scour, like, a million issues on React Native (or go look at
+In order to get it working for just your app you scour, like, a million issues on React Native (or go look at
 [artsy/eigen][eigen]) to get it compiling on your setup. Again, not optimal.
 
 This plugin _tries_ to fix this by centralizing the code needed to modify React Native. This means makes it easy to
