@@ -11,7 +11,7 @@ dev_pods_react = !File.directory?('Pods/React/React')
 # Detect CocoaPods + Frameworks
 $has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
 
-# Check for whether
+# Check for whether we're in a project that uses relative paths
 same_repo_node_modules = File.directory?('node_modules/react-native')
 previous_repo_node_modules = File.directory?('../node_modules/react-native')
 
