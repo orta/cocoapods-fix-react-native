@@ -1,20 +1,20 @@
-require 'cocoapods-fix-react-native/version_resolver'
+require 'cocoapods-fix-react-native/fix_with_context'
+require 'cocoapods-fix-react-native/issues/react_dependency_version'
+
+Pod::HooksManager.register('cocoapods-fix-react-native', :pre_install) do |context|
+  # The pre-fix resolver, usually for modifying Podspecs
+  fixer = CocoaPodsFixReactNative.new
+  fixer.pre_fix_with_context(context)
+end
+
 
 Pod::HooksManager.register('cocoapods-fix-react-native', :post_install) do |context|
-  
   # Check that the min version of iOS has been set right for CocoaPods
   # This happens when a pod has a lower than iOS 6 deployment target.
-  all_pods_targets = context.pods_project.targets
-  all_pods_targets.each do |t|
-    deployment_target = t.build_configurations.first.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
-    has_react_dep =  t.dependencies.find { |dep| dep.name == "React" }
+  dep_version = ReactDependencyVersion.new
+  dep_version.fix_with_context(context)
 
-    if has_react_dep && deployment_target == '4.3'
-      raise 'You have a Pod which has a deployment target of 4.3, and a dependency on React.' + 
-            "\nIn order for React Native to compile you need to give the Podspec for #{t.name} a version like `s.platform = :ios, '9.0'`.\n"
-    end
-  end
-
+  # The post-fix resolver, for editing the RN source code after it's been installed
   fixer = CocoaPodsFixReactNative.new
-  fixer.fix_with_context(context)
+  fixer.post_fix_with_context(context)
 end
