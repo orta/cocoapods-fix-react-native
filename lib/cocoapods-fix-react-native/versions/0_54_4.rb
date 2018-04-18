@@ -1,3 +1,5 @@
+require 'cocoapods'
+
 # Notes:
 #
 #  - All file paths should be relative to the React repo, rather than the Pods dir, or node_modules
@@ -9,7 +11,7 @@ dev_pods_react = !File.directory?('Pods/React/React')
 # Detect CocoaPods + Frameworks
 $has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
 
-# Check for whether
+# Check for whether we're in a project that uses relative paths
 same_repo_node_modules = File.directory?('node_modules/react-native')
 previous_repo_node_modules = File.directory?('../node_modules/react-native')
 
@@ -25,6 +27,7 @@ def edit_pod_file(path, old_code, new_code)
   file = File.join($root, path)
   code = File.read(file)
   if code.include?(old_code)
+    puts "[CPFRN] Editing #{file}" if Pod::Config.verbose
     FileUtils.chmod('+w', file)
     File.write(file, code.sub(old_code, new_code))
   end
@@ -43,6 +46,7 @@ def fix_cplusplus_header_compiler_error
   file.close
 
   if contents[32].include? '&'
+    puts "[CPFRN] Editing #{filepath}" if Pod::Config.verbose
     contents.insert(26, '#ifdef __cplusplus')
     contents[36] = '#endif'
 
@@ -65,6 +69,7 @@ def fix_unused_yoga_headers
   file.close
 
   if contents[12].include? 'Utils.h'
+    puts "[CPFRN] Editing #{filepath}" if Pod::Config.verbose
     contents.delete_at(15) # #import "YGNode.h"
     contents.delete_at(15) # #import "YGNodePrint.h"
     contents.delete_at(15) # #import "Yoga-internal.h"
@@ -140,6 +145,8 @@ else
   comment_end = '#endif'
 
   if contents[22].rstrip != comment_start
+    puts "[CPFRN] Editing #{filepath}" if Pod::Config.verbose
+
     contents.insert(22, comment_start)
     contents.insert(24, comment_end)
 

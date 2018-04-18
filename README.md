@@ -24,7 +24,7 @@ Lazy way (bad, but ok if 1 engineer):
 
     $ gem install cocoapods-fix-react-native
 
-Correct way, edit your gemfile to be:
+Correct way, edit [`your Gemfile`](http://www.mokacoding.com/blog/ruby-for-ios-developers-bundler/) to be:
 
     gem "cocoapods"
     gem "cocoapods-fix-react-native"
