@@ -22,6 +22,7 @@ def edit_pod_file(path, old_code, new_code)
   file = File.join($root, path)
   code = File.read(file)
   if code.include?(old_code)
+    puts "[CPFRN] Editing #{file}" if Pod::Config.verbose
     FileUtils.chmod('+w', file)
     File.write(file, code.sub(old_code, new_code))
   end
