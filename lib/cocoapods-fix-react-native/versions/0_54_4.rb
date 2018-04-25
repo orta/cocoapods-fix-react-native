@@ -25,6 +25,7 @@ end
 # TODO: move to be both file in pods and file in node_mods?
 def edit_pod_file(path, old_code, new_code)
   file = File.join($root, path)
+  return unless File.exist?(file)
   code = File.read(file)
   if code.include?(old_code)
     puts "[CPFRN] Editing #{file}" if Pod::Config.instance.verbose
