@@ -16,11 +16,12 @@ class CocoaPodsFixReactNative
     # binding.pry
 
     if File.exist? path_to_fix
-      puts "Patching React Native #{version}"
-      require(path_to_fix)
+      Pod::UI.section "Patching React Native #{version}" do
+        require(path_to_fix)
+      end
     else
-      puts "CP-Fix-React-Native does not support #{version} yet, please send PRs to"
-      puts 'https://github.com/orta/cocoapods-fix-react-native'
+      Pod::UI.warn "CP-Fix-React-Native does not support #{version} yet, please send " +
+                   'PRs to https://github.com/orta/cocoapods-fix-react-native'
     end
   end
 end
