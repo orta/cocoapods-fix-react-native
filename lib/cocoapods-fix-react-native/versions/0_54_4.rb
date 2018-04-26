@@ -23,15 +23,15 @@ if dev_pods_react
 end
 
 # TODO: move to be both file in pods and file in node_mods?
-def edit_pod_file(path, old_code, new_code)
+def patch_pod_file(path, old_code, new_code)
   file = File.join($root, path)
   unless File.exist?(file)
-    Pod::UI.warn "#{file} does not exist so was not edited.."
+    Pod::UI.warn "#{file} does not exist so was not patched.."
     return
   end
   code = File.read(file)
   if code.include?(old_code)
-    Pod::UI.message "Editing #{file}", '- '
+    Pod::UI.message "Patching #{file}", '- '
     FileUtils.chmod('+w', file)
     File.write(file, code.sub(old_code, new_code))
   end
@@ -50,7 +50,7 @@ def fix_cplusplus_header_compiler_error
   file.close
 
   if contents[32].include? '&'
-    Pod::UI.message "Editing #{filepath}", '- '
+    Pod::UI.message "Patching #{filepath}", '- '
     contents.insert(26, '#ifdef __cplusplus')
     contents[36] = '#endif'
 
@@ -73,7 +73,7 @@ def fix_unused_yoga_headers
   file.close
 
   if contents[12].include? 'Utils.h'
-    Pod::UI.message "Editing #{filepath}", '- '
+    Pod::UI.message "Patching #{filepath}", '- '
     contents.delete_at(15) # #import "YGNode.h"
     contents.delete_at(15) # #import "YGNodePrint.h"
     contents.delete_at(15) # #import "Yoga-internal.h"
@@ -122,7 +122,7 @@ detect_missing_subspecs
 animation_view_file = 'Libraries/NativeAnimation/RCTNativeAnimatedNodesManager.h'
 animation_view_old_code = 'import <RCTAnimation/RCTValueAnimatedNode.h>'
 animation_view_new_code = 'import "RCTValueAnimatedNode.h"'
-edit_pod_file animation_view_file, animation_view_old_code, animation_view_new_code
+patch_pod_file animation_view_file, animation_view_old_code, animation_view_new_code
 
 # https://github.com/facebook/react-native/issues/13198
 # Only needed when you have the DevSupport subspec
@@ -133,7 +133,7 @@ if has_dev_support
   websocket = 'Libraries/WebSocket/RCTReconnectingWebSocket.m'
   websocket_old_code = 'import <fishhook/fishhook.h>'
   websocket_new_code = 'import <React/fishhook.h>'
-  edit_pod_file websocket, websocket_old_code, websocket_new_code
+  patch_pod_file websocket, websocket_old_code, websocket_new_code
 else
   # There's a link in the DevSettings to dev-only import
   filepath = "#{$root}/React/Modules/RCTDevSettings.mm"
@@ -149,7 +149,7 @@ else
   comment_end = '#endif'
 
   if contents[22].rstrip != comment_start
-    Pod::UI.message "Editing #{filepath}", '- '
+    Pod::UI.message "Patching #{filepath}", '- '
 
     contents.insert(22, comment_start)
     contents.insert(24, comment_end)
