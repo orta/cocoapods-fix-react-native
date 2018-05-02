@@ -1,3 +1,5 @@
+require 'molinillo/dependency_graph'
+
 class CocoaPodsFixReactNative
   def post_fix_with_context(context)
     # Get the current version of React Native in your app
@@ -26,7 +28,28 @@ class CocoaPodsFixReactNative
 
   def pre_fix_with_context(context)
     # Get the current version of React Native in your app
-    react_spec = context.sandbox.specification('React')
+    locked_dependencies = Molinillo::DependencyGraph.new
+    context.lockfile.dependencies.each do |dependency|
+      locked_dependencies.add_vertex(dependency.name, dependency, true)
+    end
+
+    sources = context.podfile.sources.map do |source|
+      Pod::Config.instance.sources_manager.source_with_name_or_url(source)
+    end
+
+    resolver = Pod::Resolver.new(context.sandbox, context.podfile, locked_dependencies, sources, true)
+    target_definitions = resolver.resolve
+
+    react_spec = nil
+
+    target_definitions.each do |(definition, dependencies)|
+      next if definition.name == 'Pods'
+
+      react = dependencies.find { |d| d.spec.name == 'React' || d.spec.name.start_with?('React/') }
+      next if react.nil?
+      react_spec = react.spec
+    end
+
     if react_spec.nil?
       Pod::UI.warn "No React dependency found"
       return
