@@ -7,18 +7,20 @@ class CocoaPodsFixReactNative
       return
     end
 
-    # 0.44.1 -> 0_44_1
-    version = react.version.to_s
-    file_to_parse = version.tr('.', '_') + '-post'
-    path_to_fix = File.join(File.dirname(__FILE__), 'versions', file_to_parse + '.rb')
+    version = react_spec.version.to_s
+
+    unless patch_exists?(version)
+      Pod::UI.warn "CP-Fix-React-Native does not support #{version} yet, please send " +
+                   'PRs to https://github.com/orta/cocoapods-fix-react-native'
+      return
+    end
+
+    path_to_fix = version_file(version)
 
     if File.exist? path_to_fix
       Pod::UI.section "Patching React Native #{version}" do
         require(path_to_fix)
       end
-    else
-      Pod::UI.warn "CP-Fix-React-Native does not support #{version} yet, please send " +
-                   'PRs to https://github.com/orta/cocoapods-fix-react-native'
     end
   end
 
@@ -30,19 +32,34 @@ class CocoaPodsFixReactNative
       return
     end
 
-    # # 0.44.1 -> 0_44_1
     version = react_spec.version.to_s
-    file_to_parse = version.tr('.', '_') + '-pre'
-    path_to_fix = File.join(File.dirname(__FILE__), 'versions', file_to_parse + '.rb')
+
+    # There will probably always be a neeed for the post, but a pre can be ignored
+    return unless patch_exists?(version)
+
+    path_to_fix = version_file(version, 'pre')
 
     if File.exist? path_to_fix
       Pod::UI.section "Patching React Native #{version}" do
         require(path_to_fix)
       end
-    else
-      # There will probably always be a neeed for the post, but a pre can be ignored
-      Pod::UI.warn "CP-Fix-React-Native does not support #{version} yet, please send " +
-                   'PRs to https://github.com/orta/cocoapods-fix-react-native'
     end
   end
+
+  private
+
+    def patch_exists?(version)
+      version_file_name = version.tr('.', '_')
+      patches = Dir.glob(File.join(versions_path, "#{version_file_name}-*"))
+      patches.present?
+    end
+
+    def version_file(version, suffix = 'post')
+      file_to_parse = version.tr('.', '_') + "-#{suffix}.rb"
+      File.join(versions_path, file_to_parse)
+    end
+
+    def versions_path
+      File.expand_path('../versions', __FILE__)
+    end
 end
