@@ -17,7 +17,7 @@ class CocoaPodsFixReactNative
 
     version = react_spec.version.to_s
 
-    unless patch_exists?(version)
+    unless patch_exist?(version)
       Pod::UI.warn "CP-Fix-React-Native does not support #{version} yet, please send " +
                    'PRs to https://github.com/orta/cocoapods-fix-react-native'
       return
@@ -56,15 +56,12 @@ class CocoaPodsFixReactNative
       react_spec = react.spec
     end
 
-    if react_spec.nil?
-      Pod::UI.warn "No React dependency found"
-      return
-    end
+    return if react_spec.nil?
 
     version = react_spec.version.to_s
 
     # There will probably always be a neeed for the post, but a pre can be ignored
-    return unless patch_exists?(version)
+    return unless patch_exist?(version)
 
     path_to_fix = version_file(version, 'pre')
 
@@ -77,7 +74,7 @@ class CocoaPodsFixReactNative
 
   private
 
-    def patch_exists?(version)
+    def patch_exist?(version)
       version_file_name = version.tr('.', '_')
       patches = Dir.glob(File.join(versions_path, "#{version_file_name}-*"))
       patches.present?
