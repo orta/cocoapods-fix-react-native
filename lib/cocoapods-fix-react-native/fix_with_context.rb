@@ -43,17 +43,22 @@ class CocoaPodsFixReactNative
       Pod::Config.instance.sources_manager.source_with_name_or_url(source)
     end
 
-    resolver = Pod::Resolver.new(context.sandbox, context.podfile, locked_dependencies, sources, true)
-    target_definitions = resolver.resolve
-
     react_spec = nil
+    
+    begin
+      resolver = Pod::Resolver.new(context.sandbox, context.podfile, locked_dependencies, sources, true)
+      target_definitions = resolver.resolve
 
-    target_definitions.each do |(definition, dependencies)|
-      next if definition.name == 'Pods'
+      target_definitions.each do |(definition, dependencies)|
+        next if definition.name == 'Pods'
 
-      react = dependencies.find { |d| d.spec.name == 'React' || d.spec.name.start_with?('React/') }
-      next if react.nil?
-      react_spec = react.spec
+        react = dependencies.find { |d| d.spec.name == 'React' || d.spec.name.start_with?('React/') }
+        next if react.nil?
+        react_spec = react.spec
+      end
+    rescue StandardError => e
+      Pod::UI.warn 'Failed to resolve dependencies, so pre-patch was not applied, ' +
+                   'please try running `pod install` again to apply the patch.'
     end
 
     return if react_spec.nil?
