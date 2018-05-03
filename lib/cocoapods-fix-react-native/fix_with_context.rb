@@ -3,7 +3,13 @@ require 'molinillo/dependency_graph'
 class CocoaPodsFixReactNative
   def post_fix_with_context(context)
     # Get the current version of React Native in your app
-    react_spec = context.sandbox.specification('React')
+    react_spec = nil
+    context.umbrella_targets.each do |target|
+      react = target.specs.find { |s| s.name == 'React' || s.name.start_with?('React/') }
+      next if react.nil?
+      react_spec = react
+    end
+
     if react_spec.nil?
       Pod::UI.warn "No React dependency found"
       return
