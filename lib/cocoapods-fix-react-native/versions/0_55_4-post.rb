@@ -37,29 +37,6 @@ def patch_pod_file(path, old_code, new_code)
   end
 end
 
-def fix_cplusplus_header_compiler_error
-  filepath = File.join($root, 'React/Base/Surface/SurfaceHostingView/RCTSurfaceSizeMeasureMode.h')
-  FileUtils.chmod('+w', filepath)
-
-  contents = []
-
-  file = File.open(filepath, 'r')
-  file.each_line do |line|
-    contents << line
-  end
-  file.close
-
-  if contents[30].include? '&'
-    Pod::UI.message "Patching #{filepath}", '- '
-    contents.insert(27, '#ifdef __cplusplus')
-    contents[34] = '#endif'
-
-    file = File.open(filepath, 'w') do |f|
-      f.puts(contents)
-    end
-  end
-end
-
 def fix_unused_yoga_headers
   filepath = 'Pods/Target Support Files/yoga/yoga-umbrella.h'
   # This only exists when using CocoaPods + Frameworks
@@ -117,7 +94,6 @@ def detect_missing_subspecs
 end
 
 fix_unused_yoga_headers
-fix_cplusplus_header_compiler_error
 detect_missing_subspecs
 
 # # https://github.com/facebook/react-native/pull/14664
