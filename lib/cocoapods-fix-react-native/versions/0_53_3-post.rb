@@ -1,3 +1,4 @@
+require 'cocoapods'
 require 'cocoapods-fix-react-native/helpers/root_helper'
 
 # Obtain the React Native root directory
