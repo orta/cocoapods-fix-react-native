@@ -58,6 +58,13 @@ you can in your `Podfile`. This hook will first look at what version of React
 Native is installed, and will then run a corresponding scripts to make changes
 to the environment.
 
+## Custom React Native Root Directory
+
+To set a custom React Native root directory for dev an environment variable `COCOAPODS_FIX_REACT_NATIVE_DEV_ROOT` may be set.  Example:
+
+    # Some shell script that sets up environment variables
+    export COCOAPODS_FIX_REACT_NATIVE_DEV_ROOT="../my_react_project_directory/node_modules/react-native"
+
 ## Contributing Back
 
 You'll note that this repo has issues disabled, I'm not going to make the time
