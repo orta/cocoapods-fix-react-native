@@ -1,21 +1,7 @@
-# Notes:
-#
-#  - All file paths should be relative to the React repo, rather than the Pods dir, or node_modules
-#
+require 'cocoapods-fix-react-native/helpers/root_helper'
 
-# Are you using :path based Pods?
-dev_pods_react = !File.directory?('Pods/React/React')
-
-# Check for whether
-same_repo_node_modules = File.directory?('node_modules/react-native')
-previous_repo_node_modules = File.directory?('../node_modules/react-native')
-
-# Find out where the files could be rooted
-$root = 'Pods/React'
-if dev_pods_react
-  $root = 'node_modules/react-native' if same_repo_node_modules
-  $root = '../node_modules/react-native' if previous_repo_node_modules
-end
+# Obtain the React Native root directory
+$root = get_root
 
 # TODO: move to be both file in pods and file in node_mods?
 def edit_pod_file(path, old_code, new_code)
