@@ -112,30 +112,30 @@ if has_dev_support
   websocket_old_code = 'import <fishhook/fishhook.h>'
   websocket_new_code = 'import <React/fishhook.h>'
   patch_pod_file websocket, websocket_old_code, websocket_new_code
-else
-  # There's a link in the DevSettings to dev-only import
-  filepath = "#{$root}/React/Modules/RCTDevSettings.mm"
-  contents = []
-  file = File.open(filepath, 'r')
-  found = false
-  file.each_line do |line|
-    contents << line
-  end
-  file.close
+end
 
-  comment_start = '#if ENABLE_PACKAGER_CONNECTION'
-  comment_end = '#endif'
+# There's a link in the DevSettings to dev-only import
+filepath = "#{$root}/React/Modules/RCTDevSettings.mm"
+contents = []
+file = File.open(filepath, 'r')
+found = false
+file.each_line do |line|
+  contents << line
+end
+file.close
 
-  if contents[20].include? 'RCTPackagerClient.h'
-    Pod::UI.message "Patching #{filepath}", '- '
-    contents.insert(20, comment_start)
-    contents.insert(22, comment_end)
+comment_start = '#if ENABLE_PACKAGER_CONNECTION'
+comment_end = '#endif'
 
-    contents.insert(205, comment_start)
-    contents.insert(229, comment_end)
+if contents[20].include? 'RCTPackagerClient.h'
+  Pod::UI.message "Patching #{filepath}", '- '
+  contents.insert(20, comment_start)
+  contents.insert(22, comment_end)
 
-    file = File.open(filepath, 'w') do |f|
-      f.puts(contents)
-    end
+  contents.insert(205, comment_start)
+  contents.insert(229, comment_end)
+
+  file = File.open(filepath, 'w') do |f|
+    f.puts(contents)
   end
 end
