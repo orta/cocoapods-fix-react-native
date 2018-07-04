@@ -22,33 +22,6 @@ def patch_pod_file(path, old_code, new_code)
   end
 end
 
-def fix_unused_yoga_headers
-  filepath = 'Pods/Target Support Files/yoga/yoga-umbrella.h'
-  # This only exists when using CocoaPods + Frameworks
-  return unless File.exists?(filepath)
-
-  contents = []
-  file = File.open(filepath, 'r')
-  file.each_line do |line|
-    contents << line
-  end
-  file.close
-
-  if contents[12].include? 'Utils.h'
-    Pod::UI.message "Patching #{filepath}", '- '
-    contents.delete_at(14) # #import "YGLayout.h"
-    contents.delete_at(15) # #import "YGNode.h"
-    contents.delete_at(15) # #import "YGNodePrint.h"
-    contents.delete_at(15) # #import "YGStyle.h"
-    contents.delete_at(15) # #import "Yoga-internal.h"
-    contents.delete_at(12) # #import "Utils.h"
-
-    file = File.open(filepath, 'w') do |f|
-      f.puts(contents)
-    end
-  end
-end
-
 # Detect source file dependency in the generated Pods.xcodeproj workspace sub-project
 def has_pods_project_source_file(source_filename)
   pods_project = 'Pods/Pods.xcodeproj/project.pbxproj'
@@ -78,7 +51,6 @@ def detect_missing_subspecs
   detect_missing_subspec_dependency('DevSupport', 'RCTDevSettings.mm', 'RCTPackagerClient.m')
 end
 
-fix_unused_yoga_headers
 detect_missing_subspecs
 
 # # https://github.com/facebook/react-native/pull/14664
