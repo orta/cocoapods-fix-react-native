@@ -35,8 +35,12 @@ class CocoaPodsFixReactNative
   def pre_fix_with_context(context)
     # Get the current version of React Native in your app
     locked_dependencies = Molinillo::DependencyGraph.new
-    context.lockfile.dependencies.each do |dependency|
-      locked_dependencies.add_vertex(dependency.name, dependency, true)
+    if context.lockfile
+      context.lockfile.dependencies.each do |dependency|
+        locked_dependencies.add_vertex(dependency.name, dependency, true)
+      end
+    else
+      Pod::UI.warn 'No Podfile.lock present. Continuing without locked dependencies.'
     end
 
     sources = context.podfile.sources.map do |source|
