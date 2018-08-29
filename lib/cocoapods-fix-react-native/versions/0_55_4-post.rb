@@ -94,8 +94,8 @@ has_dev_support = File.exist?(File.join($root, 'Libraries/WebSocket/RCTReconnect
 if has_dev_support
   # Move Fishhook to be based on RN's imports
   websocket = 'Libraries/WebSocket/RCTReconnectingWebSocket.m'
-  websocket_old_code = 'import <fishhook/fishhook.h>'
-  websocket_new_code = 'import <React/fishhook.h>'
+  websocket_old_code = 'import <React/fishhook.h>'
+  websocket_new_code = 'import "fishhook.h"'
   patch_pod_file websocket, websocket_old_code, websocket_new_code
 end
 
