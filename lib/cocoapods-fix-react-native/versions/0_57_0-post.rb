@@ -7,21 +7,6 @@ $root = get_root
 # Detect CocoaPods + Frameworks
 $has_frameworks = File.exists?'Pods/Target Support Files/React/React-umbrella.h'
 
-# TODO: move to be both file in pods and file in node_mods?
-def patch_pod_file(path, old_code, new_code)
-  file = File.join($root, path)
-  unless File.exist?(file)
-    Pod::UI.warn "#{file} does not exist so was not patched.."
-    return
-  end
-  code = File.read(file)
-  if code.include?(old_code)
-    Pod::UI.message "Patching #{file}", '- '
-    FileUtils.chmod('+w', file)
-    File.write(file, code.sub(old_code, new_code))
-  end
-end
-
 # Detect source file dependency in the generated Pods.xcodeproj workspace sub-project
 def has_pods_project_source_file(source_filename)
   pods_project = 'Pods/Pods.xcodeproj/project.pbxproj'
