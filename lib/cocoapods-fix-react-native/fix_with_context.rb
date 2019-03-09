@@ -26,48 +26,14 @@ class CocoaPodsFixReactNative
     path_to_fix = version_file(version)
 
     if File.exist? path_to_fix
-      Pod::UI.section "Patching React Native #{version}" do
+      Pod::UI.section "Post-Patching React Native #{version}" do
         require(path_to_fix)
       end
     end
   end
 
   def pre_fix_with_context(context)
-    # Get the current version of React Native in your app
-    locked_dependencies = Molinillo::DependencyGraph.new
-    if context.lockfile
-      context.lockfile.dependencies.each do |dependency|
-        locked_dependencies.add_vertex(dependency.name, dependency, true)
-      end
-    else
-      Pod::UI.warn 'No Podfile.lock present. Continuing without locked dependencies.'
-    end
-
-    sources = context.podfile.sources.map do |source|
-      Pod::Config.instance.sources_manager.source_with_name_or_url(source)
-    end
-
-    react_spec = nil
-    
-    begin
-      resolver = Pod::Resolver.new(context.sandbox, context.podfile, locked_dependencies, sources, true)
-      target_definitions = resolver.resolve
-
-      target_definitions.each do |(definition, dependencies)|
-        next if definition.name == 'Pods'
-
-        react = dependencies.find { |d| d.spec.name == 'React' || d.spec.name.start_with?('React/') }
-        next if react.nil?
-        react_spec = react.spec
-      end
-    rescue StandardError => e
-      Pod::UI.warn 'Failed to resolve dependencies, so pre-patch was not applied, ' +
-                   'please try running `pod install` again to apply the patch.'
-    end
-
-    return if react_spec.nil?
-
-    version = react_spec.version.to_s
+    version = '0.58.6'
 
     # There will probably always be a neeed for the post, but a pre can be ignored
     return unless patch_exist?(version)
@@ -75,7 +41,7 @@ class CocoaPodsFixReactNative
     path_to_fix = version_file(version, 'pre')
 
     if File.exist? path_to_fix
-      Pod::UI.section "Patching React Native #{version}" do
+      Pod::UI.section "Pre-Patching React Native #{version}" do
         require(path_to_fix)
       end
     end
